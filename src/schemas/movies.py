@@ -26,6 +26,7 @@ class MovieListResponseSchema(MovieBase):
     total_pages: int
     total_items: int
 
+
 class MovieDetailResponseSchema(MovieBase):
     ...
 
