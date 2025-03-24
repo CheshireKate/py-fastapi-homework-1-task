@@ -6,12 +6,12 @@ from starlette.responses import Response
 from src.database.models import MovieModel
 from src.database.session import get_db
 
-from src.schemas.movies import MovieBase, MovieListResponseSchema
+from src.schemas.movies import MovieBase, MovieListResponseSchema, MovieDetailResponseSchema
 
 router = APIRouter()
 
 
-@router.get("/movies/{film_id}", response_model=MovieListResponseSchema)
+@router.get("/movies/{film_id}", response_model=MovieDetailResponseSchema)
 async def get_movie(movie_id: int, db: AsyncSession = Depends(get_db)) -> Response:
     result = await db.execute(select(MovieModel).where(MovieModel.id == movie_id))
     film = result.scalar_one_or_none()
