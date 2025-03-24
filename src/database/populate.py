@@ -44,20 +44,20 @@ class CSVDatabaseSeeder:
         """
         Load and preprocess the CSV file before inserting data into the database.
 
-        The function removes duplicate records based on 'names' and 'date_x',
+        The function removes duplicate records based on "names" and "date_x",
         replaces missing values, trims whitespace, and converts dates to a standard format.
 
         :return: Preprocessed DataFrame containing the movie data.
         :rtype: pd.DataFrame
         """
         data = pd.read_csv(self._csv_file_path)
-        data = data.drop_duplicates(subset=['names', 'date_x'], keep='first')
-        data['crew'] = data['crew'].fillna('Unknown')
-        data['genre'] = data['genre'].fillna('Unknown')
-        data['genre'] = data['genre'].str.replace('\u00A0', '', regex=True)
-        data['date_x'] = data['date_x'].str.strip()
-        data['date_x'] = pd.to_datetime(data['date_x'], format='%m/%d/%Y', errors='coerce')
-        data['date_x'] = data['date_x'].dt.date
+        data = data.drop_duplicates(subset=["names", "date_x"], keep="first")
+        data["crew"] = data["crew"].fillna("Unknown")
+        data["genre"] = data["genre"].fillna("Unknown")
+        data["genre"] = data["genre"].str.replace("\u00A0", "", regex=True)
+        data["date_x"] = data["date_x"].str.strip()
+        data["date_x"] = pd.to_datetime(data["date_x"], format="%m/%d/%Y", errors="coerce")
+        data["date_x"] = data["date_x"].dt.date
         print("Preprocessing csv file")
         return data
 
@@ -81,18 +81,18 @@ class CSVDatabaseSeeder:
             async with self._db_session.begin():
                 for _, row in tqdm(data.iterrows(), total=data.shape[0], desc="Seeding database"):
                     movie = MovieModel(
-                        name=row['names'],
-                        date=row['date_x'],
-                        score=float(row['score']),
-                        genre=row['genre'],
-                        overview=row['overview'],
-                        crew=row['crew'],
-                        orig_title=row['orig_title'],
-                        status=row['status'],
-                        orig_lang=row['orig_lang'],
-                        budget=float(row['budget_x']),
-                        revenue=float(row['revenue']),
-                        country=row['country']
+                        name=row["names"],
+                        date=row["date_x"],
+                        score=float(row["score"]),
+                        genre=row["genre"],
+                        overview=row["overview"],
+                        crew=row["crew"],
+                        orig_title=row["orig_title"],
+                        status=row["status"],
+                        orig_lang=row["orig_lang"],
+                        budget=float(row["budget_x"]),
+                        revenue=float(row["revenue"]),
+                        country=row["country"]
                     )
                     self._db_session.add(movie)
 

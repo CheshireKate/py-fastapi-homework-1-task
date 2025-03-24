@@ -2,6 +2,7 @@ import datetime
 
 from pydantic import BaseModel
 
+
 class MovieBase(BaseModel):
     id: int
     name: str
@@ -27,4 +28,3 @@ class MovieListResponseSchema(MovieBase):
 
     class Config:
         from_attributes = True
-
