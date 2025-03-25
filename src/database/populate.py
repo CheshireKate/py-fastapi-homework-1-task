@@ -50,12 +50,18 @@ class CSVDatabaseSeeder:
         :return: Preprocessed DataFrame containing the movie data.
         :rtype: pd.DataFrame
         """
+        #reads the file
         data = pd.read_csv(self._csv_file_path)
+        #deletes duplicates
         data = data.drop_duplicates(subset=["names", "date_x"], keep="first")
+        #if nan fills "Unknown"
         data["crew"] = data["crew"].fillna("Unknown")
         data["genre"] = data["genre"].fillna("Unknown")
+        #deletes spaces
         data["genre"] = data["genre"].str.replace("\u00A0", "", regex=True)
+        # deletes spaces at the beginning and at the end
         data["date_x"] = data["date_x"].str.strip()
+        #formaties to datetime
         data["date_x"] = pd.to_datetime(data["date_x"], format="%m/%d/%Y", errors="coerce")
         data["date_x"] = data["date_x"].dt.date
         print("Preprocessing csv file")

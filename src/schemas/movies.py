@@ -1,9 +1,10 @@
 import datetime
+from typing import List
 
 from pydantic import BaseModel
 
 
-class MovieBase(BaseModel):
+class MovieModel(BaseModel):
     id: int
     name: str
     date: datetime.date
@@ -19,16 +20,16 @@ class MovieBase(BaseModel):
     country: str
 
 
-class MovieListResponseSchema(MovieBase):
-    id: int
+class MovieListResponseSchema(BaseModel):
+    movies: List[MovieModel]
     prev_page: int
     next_page: int
     total_pages: int
     total_items: int
 
 
-class MovieDetailResponseSchema(MovieBase):
-    ...
+class MovieDetailResponseSchema(MovieModel):
+    pass
 
     class Config:
         from_attributes = True

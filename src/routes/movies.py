@@ -6,13 +6,13 @@ from starlette.responses import Response
 from src.database.models import MovieModel
 from src.database.session import get_db
 
-from src.schemas.movies import MovieBase, MovieListResponseSchema, MovieDetailResponseSchema
+from src.schemas.movies import MovieModel, MovieListResponseSchema, MovieDetailResponseSchema
 
 router = APIRouter()
 
 
 @router.get("/movies/{film_id}", response_model=MovieDetailResponseSchema)
-async def get_movie(movie_id: int, db: AsyncSession = Depends(get_db)) -> Response:
+async def get_movie(movie_id: int, db: AsyncSession = Depends(get_db)) -> MovieDetailResponseSchema:
     result = await db.execute(select(MovieModel).where(MovieModel.id == movie_id))
     film = result.scalar_one_or_none()
     if not film:
@@ -21,14 +21,14 @@ async def get_movie(movie_id: int, db: AsyncSession = Depends(get_db)) -> Respon
 
 
 @router.get("/movies", response_model=MovieListResponseSchema)
-async def get_movies(page: int = 1, per_page: int = 10, db: AsyncSession = Depends(get_db)) -> Response:
+async def get_movies(page: int = 1, per_page: int = 10, db: AsyncSession = Depends(get_db)) -> MovieListResponseSchema:
     if page < 1:
         raise HTTPException(status_code=422, detail={
             "loc": ["query", "page"],
             "msg": "ensure this value is greater than or equal to 1",
             "type": "value_error.number.not_ge"
         })
-    query = await db.query(MovieBase).offset(page).limit(per_page)
+    query = await db.query(MovieModel).offset(page).limit(per_page)
     movies = (await db.execute(query)).scalars().all()
     if not movies:
         raise HTTPException(status_code=404, detail="No movies found.")
