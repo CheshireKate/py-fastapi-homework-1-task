@@ -12,20 +12,6 @@ from src.schemas.movies import MovieListResponseSchema, MovieDetailResponseSchem
 router = APIRouter(redirect_slashes=False)
 
 
-@router.get("/movies/{movie_id}/", response_model=MovieDetailResponseSchema)
-async def get_movie(
-    movie_id: int, db: AsyncSession = Depends(get_db)
-) -> MovieDetailResponseSchema:
-    result = await db.execute(select(MovieModel).where(MovieModel.id == movie_id))
-    film = result.scalar_one_or_none()
-    print("Router slash redirect setting:", router.redirect_slashes)
-    if not film:
-        raise HTTPException(
-            status_code=404, detail="Movie with the given ID was not found."
-        )
-    return film
-
-
 @router.get("/movies/", response_model=MovieListResponseSchema)
 async def get_movies(
     page: int = 1, per_page: int = 10, db: AsyncSession = Depends(get_db)
@@ -67,7 +53,7 @@ async def get_movies(
     )
 
     response = MovieListResponseSchema(
-        movies=movies,
+        movies=[MovieDetailResponseSchema.from_orm(movie) for movie in movies],
         prev_page=prev_page_url,
         next_page=next_page_url,
         total_pages=total_pages,
@@ -75,3 +61,17 @@ async def get_movies(
     )
 
     return response
+
+
+@router.get("/movies/{movie_id}/", response_model=MovieDetailResponseSchema)
+async def get_movie(
+    movie_id: int, db: AsyncSession = Depends(get_db)
+) -> MovieDetailResponseSchema:
+    result = await db.execute(select(MovieModel).where(MovieModel.id == movie_id))
+    film = result.scalar_one_or_none()
+    print("Router slash redirect setting:", router.redirect_slashes)
+    if not film:
+        raise HTTPException(
+            status_code=404, detail="Movie with the given ID was not found."
+        )
+    return film
