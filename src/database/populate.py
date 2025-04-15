@@ -6,7 +6,7 @@ from tqdm.asyncio import tqdm
 
 from src.config.settings import get_settings
 from src.database.models import MovieModel
-from src.database.session import  get_db_contextmanager, init_db
+from src.database.session import get_db_contextmanager, init_db
 
 
 class CSVDatabaseSeeder:
@@ -37,7 +37,9 @@ class CSVDatabaseSeeder:
         :return: True if the database contains at least one record, False otherwise.
         :rtype: bool
         """
-        result = await self._db_session.execute(select(func.count()).select_from(MovieModel))
+        result = await self._db_session.execute(
+            select(func.count()).select_from(MovieModel)
+        )
         total_count = result.scalar_one()
         return total_count > 0
 
@@ -51,19 +53,21 @@ class CSVDatabaseSeeder:
         :return: Preprocessed DataFrame containing the movie data.
         :rtype: pd.DataFrame
         """
-        #reads the file
+        # reads the file
         data = pd.read_csv(self._csv_file_path)
-        #deletes duplicates
+        # deletes duplicates
         data = data.drop_duplicates(subset=["names", "date_x"], keep="first")
-        #if nan fills "Unknown"
+        # if nan fills "Unknown"
         data["crew"] = data["crew"].fillna("Unknown")
         data["genre"] = data["genre"].fillna("Unknown")
-        #deletes spaces
-        data["genre"] = data["genre"].str.replace("\u00A0", "", regex=True)
+        # deletes spaces
+        data["genre"] = data["genre"].str.replace("\u00a0", "", regex=True)
         # deletes spaces at the beginning and at the end
         data["date_x"] = data["date_x"].str.strip()
-        #formaties to datetime
-        data["date_x"] = pd.to_datetime(data["date_x"], format="%m/%d/%Y", errors="coerce")
+        # formaties to datetime
+        data["date_x"] = pd.to_datetime(
+            data["date_x"], format="%m/%d/%Y", errors="coerce"
+        )
         data["date_x"] = data["date_x"].dt.date
         print("Preprocessing csv file")
         return data
@@ -86,7 +90,9 @@ class CSVDatabaseSeeder:
             data = await self._preprocess_csv()
 
             async with self._db_session.begin():
-                for _, row in tqdm(data.iterrows(), total=data.shape[0], desc="Seeding database"):
+                for _, row in tqdm(
+                    data.iterrows(), total=data.shape[0], desc="Seeding database"
+                ):
                     movie = MovieModel(
                         name=row["names"],
                         date=row["date_x"],
@@ -99,7 +105,7 @@ class CSVDatabaseSeeder:
                         orig_lang=row["orig_lang"],
                         budget=float(row["budget_x"]),
                         revenue=float(row["revenue"]),
-                        country=row["country"]
+                        country=row["country"],
                     )
                     self._db_session.add(movie)
 

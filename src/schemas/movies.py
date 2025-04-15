@@ -20,12 +20,19 @@ class MovieModel(BaseModel):
     country: str
 
 
+class MovieCreate(MovieModel):
+    pass
+
+
 class MovieListResponseSchema(BaseModel):
     movies: List[MovieModel]
-    prev_page: int
-    next_page: int
+    prev_page: str | None = None
+    next_page: str | None = None
     total_pages: int
     total_items: int
+
+    class Config:
+        from_attributes = True
 
 
 class MovieDetailResponseSchema(MovieModel):

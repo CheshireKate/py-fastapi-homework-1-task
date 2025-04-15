@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from src.config.settings import get_settings
-from .models import Base
+from src.database.models import Base
 
 settings = get_settings()
 
@@ -13,7 +13,9 @@ DATABASE_URL = f"sqlite+aiosqlite:///{settings.PATH_TO_DB}"
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 
-AsyncSQLiteSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)  # type: ignore
+AsyncSQLiteSessionLocal = sessionmaker(
+    bind=engine, class_=AsyncSession, expire_on_commit=False
+)  # type: ignore
 
 
 async def init_db() -> None:
